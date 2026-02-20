@@ -11,6 +11,7 @@ export default function Header() {
         <Link href="/music" className="hover:text-gray-300 transition-colors">Музыка</Link>
         <Link href="/videos" className="hover:text-gray-300 transition-colors">Видео</Link>
         <Link href="/events" className="hover:text-gray-300 transition-colors">Афиша</Link>
+        <Link href="/contacts" className="hover:text-white transition">Контакты</Link>
       </nav>
     </header>
   );
