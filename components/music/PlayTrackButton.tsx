@@ -2,11 +2,11 @@
 
 import { usePlayerStore } from '@/store/usePlayerStore';
 
-// Описываем для TypeScript, что мы ждем от базы данных
+// 1. Исправляем интерфейс
 interface StrapiTrack {
   id: number;
   title: string;
-  audio?: {
+  audioFile?: {
     url: string;
   };
 }
@@ -20,8 +20,9 @@ export default function PlayTrackButton({ track }: { track: StrapiTrack }) {
     if (isThisTrack) {
       isPlaying ? pauseTrack() : resumeTrack();
     } else {
-      const audioUrl = track.audio?.url 
-        ? `http://localhost:1337${track.audio.url}` 
+      // 2. Достаем ссылку из audioFile, а не из audio
+      const audioUrl = track.audioFile?.url 
+        ? `http://localhost:1337${track.audioFile.url}` 
         : 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
       playTrack({

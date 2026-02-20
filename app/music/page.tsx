@@ -1,17 +1,16 @@
 import Image from 'next/image';
 import PlayTrackButton from '@/components/music/PlayTrackButton';
 
-// 1. Описываем, как выглядит Трек из базы
+// 1. Исправляем audio на audioFile
 interface StrapiTrack {
   id: number;
   title: string;
   duration?: string;
-  audio?: {
+  audioFile?: {
     url: string;
   };
 }
 
-// 2. Описываем, как выглядит Альбом (Релиз) из базы
 interface StrapiRelease {
   id: number;
   title: string;
@@ -24,22 +23,26 @@ interface StrapiRelease {
 
 async function getMusicReleases() {
   try {
+    // Железобетонный синтаксис массивов для Strapi v5
     const res = await fetch(
-      'http://localhost:1337/api/music-releases?populate[cover]=*&populate[tracks][populate]=*', 
+      'http://127.0.0.1:1337/api/music-releases?populate[0]=cover&populate[1]=tracks.audioFile', 
       { cache: 'no-store' }
     );
-    if (!res.ok) return null;
+    
+    if (!res.ok) {
+      console.error("Ошибка API. Статус:", res.status);
+      return null;
+    }
+    
     return res.json();
   } catch (error) {
-    console.error("Ошибка API:", error);
+    console.error("Ошибка при запросе API:", error);
     return null;
   }
 }
 
 export default async function MusicPage() {
   const response = await getMusicReleases();
-  
-  // 3. Говорим TypeScript, что releases - это массив наших альбомов
   const releases: StrapiRelease[] = response?.data || [];
 
   return (
@@ -50,7 +53,6 @@ export default async function MusicPage() {
         <p className="text-center text-zinc-400">Музыка пока не загружена...</p>
       ) : (
         <div className="space-y-16">
-          {/* Теперь TS сам знает, что release - это StrapiRelease, никаких any! */}
           {releases.map((release) => {
             const coverUrl = release.cover?.url ? `http://localhost:1337${release.cover.url}` : null;
             const tracks = release.tracks || [];
@@ -84,7 +86,6 @@ export default async function MusicPage() {
                     {tracks.length === 0 ? (
                       <p className="text-sm text-zinc-500">В этом релизе пока нет треков.</p>
                     ) : (
-                      // TS знает, что track - это StrapiTrack
                       tracks.map((track, index) => (
                         <div 
                           key={track.id} 
@@ -92,7 +93,6 @@ export default async function MusicPage() {
                         >
                           <div className="flex items-center gap-4">
                             <span className="text-zinc-600 w-4 text-sm">{index + 1}</span>
-                            {/* Передаем чистый track, никаких as any */}
                             <PlayTrackButton track={track} />
                             <span className="font-medium text-zinc-200">{track.title}</span>
                           </div>
