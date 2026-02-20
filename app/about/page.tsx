@@ -12,8 +12,7 @@ interface StrapiArtistInfo { fullBio?: StrapiBlockNode[]; shortBio?: string; mai
 
 async function getArtistInfo() {
   try { 
-    // Явный запрос на mainPhoto
-    const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
+    const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=*', { cache: 'no-store' }); 
     return res.ok ? res.json() : null; 
   } catch (e) { return null; }
 }
@@ -21,7 +20,7 @@ async function getArtistInfo() {
 export default async function AboutPage() {
   const response = await getArtistInfo();
   const artistInfo: StrapiArtistInfo = response?.data || {};
-  // И здесь 127.0.0.1
+  
   const photoUrl = artistInfo.mainPhoto?.url ? `http://127.0.0.1:1337${artistInfo.mainPhoto.url}` : null;
 
   return (

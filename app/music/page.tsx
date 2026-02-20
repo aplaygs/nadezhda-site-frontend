@@ -7,14 +7,13 @@ export const metadata: Metadata = {
   description: "Официальная дискография, альбомы и синглы.",
 };
 
-// ИСПРАВЛЕНО: audioFile
 interface StrapiTrack { id: number; title: string; audioFile?: { url: string; }; }
 interface StrapiRelease { id: number; title: string; releaseDate: string; cover?: { url: string; }; tracks?: StrapiTrack[]; }
 
 async function getReleases() {
   try {
-    // ИСПРАВЛЕНО: Глубокий populate для audioFile
-    const res = await fetch('http://127.0.0.1:1337/api/music-releases?populate[cover]=*&populate[tracks][populate]=audioFile&sort[0]=releaseDate:desc', { cache: 'no-store' });
+    // Идеально правильный запрос для Strapi v5
+    const res = await fetch('http://127.0.0.1:1337/api/music-releases?populate[0]=cover&populate[1]=tracks.audioFile&sort=releaseDate:desc', { cache: 'no-store' });
     return res.ok ? res.json() : null;
   } catch (e) { return null; }
 }

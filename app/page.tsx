@@ -7,20 +7,31 @@ interface StrapiNews { id: number; title: string; publishDate: string; mainImage
 
 async function getArtistInfo() {
   try { 
-    // Явный запрос на mainPhoto
+    console.log("-> Отправляю запрос за фото к Strapi...");
     const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
-    return res.ok ? res.json() : null; 
-  } catch (e) { return null; }
+    
+    if (!res.ok) {
+      console.log("❌ ОШИБКА STRAPI:", res.status, res.statusText);
+      return null;
+    }
+    
+    const data = await res.json();
+    console.log("✅ ОТВЕТ STRAPI (ДАННЫЕ):", JSON.stringify(data, null, 2));
+    return data;
+  } catch (e) { 
+    console.error("🔥 КРИТИЧЕСКАЯ ОШИБКА FETCH:", e);
+    return null; 
+  }
 }
 async function getUpcomingEvents() {
   try {
-    const res = await fetch('http://127.0.0.1:1337/api/events?sort[0]=date:asc', { cache: 'no-store' });
+    const res = await fetch('http://127.0.0.1:1337/api/events?sort=date:asc', { cache: 'no-store' });
     if (!res.ok) return null; const json = await res.json(); const now = new Date();
     return (json.data || []).filter((e: StrapiEvent) => new Date(e.date) >= now).slice(0, 2);
   } catch (e) { return null; }
 }
 async function getLatestNews() {
-  try { const res = await fetch('http://127.0.0.1:1337/api/news-posts?sort[0]=publishDate:desc&pagination[limit]=2&populate=mainImage', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
+  try { const res = await fetch('http://127.0.0.1:1337/api/news-posts?sort=publishDate:desc&pagination[limit]=2&populate=mainImage', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
 }
 
 export default async function Home() {
@@ -28,7 +39,6 @@ export default async function Home() {
   const artistInfo: StrapiArtistInfo = artistRes?.data || {};
   const upcomingEvents: StrapiEvent[] = upcomingEventsData || [];
   
-  // Возвращаем 127.0.0.1 для ссылки на картинку
   const photoUrl = artistInfo.mainPhoto?.url ? `http://127.0.0.1:1337${artistInfo.mainPhoto.url}` : null;
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 
