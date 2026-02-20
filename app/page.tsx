@@ -6,22 +6,7 @@ interface StrapiEvent { id: number; title: string; date: string; city: string; v
 interface StrapiNews { id: number; title: string; publishDate: string; mainImage?: { url: string; }; }
 
 async function getArtistInfo() {
-  try { 
-    console.log("-> Отправляю запрос за фото к Strapi...");
-    const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
-    
-    if (!res.ok) {
-      console.log("❌ ОШИБКА STRAPI:", res.status, res.statusText);
-      return null;
-    }
-    
-    const data = await res.json();
-    console.log("✅ ОТВЕТ STRAPI (ДАННЫЕ):", JSON.stringify(data, null, 2));
-    return data;
-  } catch (e) { 
-    console.error("🔥 КРИТИЧЕСКАЯ ОШИБКА FETCH:", e);
-    return null; 
-  }
+  try { const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=*', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
 }
 async function getUpcomingEvents() {
   try {
@@ -43,24 +28,36 @@ export default async function Home() {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 
   return (
-    <main className="p-8 max-w-6xl mx-auto space-y-32 my-12 animate-fade-in-up">
+    <main className="p-8 max-w-6xl mx-auto space-y-32 my-12 animate-fade-in-up overflow-hidden">
       <section className="flex flex-col md:flex-row gap-16 items-center">
-        <div className="flex-1 space-y-8">
+        <div className="flex-1 space-y-8 z-10">
           <h1 className="text-6xl md:text-8xl font-serif text-stone-900 leading-tight">
             Надежда <br/><span className="text-amber-800 italic text-5xl md:text-7xl font-light">Колесникова</span>
           </h1>
           <p className="text-xl text-stone-600 leading-relaxed border-l-2 border-amber-700 pl-6 font-light">
             {artistInfo.shortBio || "Добро пожаловать на официальный сайт. Здесь вы найдете расписание концертов, дискографию и последние новости."}
           </p>
-          <div className="flex flex-wrap gap-4 pt-4">
-            <Link href="/music" className="bg-stone-900 text-stone-50 px-10 py-4 font-medium tracking-wide hover:bg-amber-800 transition duration-300 shadow-md">Слушать музыку</Link>
-            <Link href="/about" className="border border-stone-300 text-stone-700 px-10 py-4 font-medium tracking-wide hover:border-amber-800 hover:text-amber-800 transition duration-300">Подробнее</Link>
+          
+          <div className="flex flex-wrap gap-5 pt-6">
+            <Link href="/music" className="bg-amber-700 text-white px-10 py-4 rounded-full font-medium tracking-widest uppercase text-sm hover:bg-amber-800 hover:shadow-[0_10px_30px_rgba(180,83,9,0.3)] hover:-translate-y-1 transition-all duration-300">
+              Слушать музыку
+            </Link>
+            <Link href="/about" className="bg-white border border-stone-200 text-stone-600 px-10 py-4 rounded-full font-medium tracking-widest uppercase text-sm hover:border-amber-700 hover:text-amber-700 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300">
+              Подробнее
+            </Link>
           </div>
         </div>
+        
+        {/* ИЗМЕНЕНО: Эстетика "Арки" */}
         {photoUrl && (
-          <div className="w-full md:w-5/12 relative">
-            <div className="absolute top-4 -left-4 w-full h-full border border-amber-700/30 -z-10 hidden md:block"></div>
-            <Image src={photoUrl} alt="Надежда Колесникова" width={600} height={800} className="shadow-xl object-cover" priority />
+          <div className="w-full md:w-5/12 relative group mt-10 md:mt-0">
+            {/* Декоративная линия позади (смещена вправо и вниз) */}
+            <div className="absolute top-6 left-6 w-full h-full border border-amber-700/30 rounded-t-full rounded-b-[2rem] -z-10 transition-transform duration-700 group-hover:translate-x-3 group-hover:translate-y-3"></div>
+            
+            {/* Само фото в виде арки */}
+            <div className="relative rounded-t-full rounded-b-[2rem] overflow-hidden shadow-2xl border-4 border-white bg-white">
+              <Image src={photoUrl} alt="Надежда Колесникова" width={600} height={800} className="w-full object-cover hover:scale-105 transition-transform duration-1000 ease-out" priority />
+            </div>
           </div>
         )}
       </section>
@@ -76,11 +73,15 @@ export default async function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {upcomingEvents.map((event) => (
-              <div key={event.id} className="bg-white p-8 border border-stone-100 shadow-sm hover:shadow-md transition duration-300">
+              <div key={event.id} className="bg-white p-8 border border-stone-100 shadow-sm hover:shadow-md transition duration-300 rounded-2xl">
                 <div className="text-amber-700 font-bold mb-3 tracking-widest uppercase text-sm">{formatDate(event.date)}</div>
                 <h3 className="text-2xl font-serif text-stone-900 mb-2">{event.title}</h3>
                 <div className="text-stone-500 mb-6 font-light">г. {event.city}, {event.venue}</div>
-                {event.ticketLink && <a href={event.ticketLink} target="_blank" rel="noreferrer" className="text-sm border border-stone-300 px-6 py-2 hover:bg-amber-800 hover:text-white hover:border-amber-800 transition inline-block">Билеты</a>}
+                {event.ticketLink && (
+                  <a href={event.ticketLink} target="_blank" rel="noreferrer" className="inline-block bg-stone-50 border border-stone-200 text-stone-700 px-8 py-3 rounded-full hover:bg-amber-700 hover:text-white hover:border-amber-700 transition-all duration-300 text-sm uppercase tracking-widest font-medium">
+                    Билеты
+                  </a>
+                )}
               </div>
             ))}
           </div>
