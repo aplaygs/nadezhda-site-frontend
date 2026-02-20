@@ -1,6 +1,12 @@
 import Image from 'next/image';
 import PlayTrackButton from '@/components/music/PlayTrackButton';
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Дискография | Надежда Колесникова",
+  description: "Слушать песни и романсы в исполнении Надежды Колесниковой. Официальная дискография.",
+};
 // 1. Исправляем audio на audioFile
 interface StrapiTrack {
   id: number;

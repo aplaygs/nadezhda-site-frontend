@@ -1,5 +1,10 @@
 import React from 'react';
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Видео и клипы | Надежда Колесникова",
+  description: "Записи с концертов, клипы и выступления Надежды Колесниковой.",
+};
 // 1. Обновляем интерфейс: меняем rutubeLink/vkVideoLink на единый videoLink
 interface StrapiVideo {
   id: number;

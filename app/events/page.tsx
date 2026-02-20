@@ -1,5 +1,10 @@
 import React from 'react';
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Афиша концертов | Надежда Колесникова",
+  description: "Расписание ближайших выступлений и архив прошедших концертов.",
+};
 // 1. Описываем структуру Концерта из базы данных
 interface StrapiEvent {
   id: number;
