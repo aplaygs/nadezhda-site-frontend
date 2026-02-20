@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import AudioPlayer from "@/components/layout/AudioPlayer";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -25,9 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased pb-24`}>
         <Header />
         {children}
+        <AudioPlayer />
       </body>
     </html>
   );
