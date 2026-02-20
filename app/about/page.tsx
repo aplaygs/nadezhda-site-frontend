@@ -29,7 +29,8 @@ interface StrapiArtistInfo {
 
 async function getArtistInfo() {
   try { 
-    const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=*', { cache: 'no-store' }); 
+    // ВАЖНО: Мы поменяли populate на mainPhoto для корректной работы Strapi v5
+    const res = await fetch('http://localhost:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
     return res.ok ? res.json() : null; 
   } catch (e) { return null; }
 }

@@ -6,7 +6,11 @@ interface StrapiEvent { id: number; title: string; date: string; city: string; v
 interface StrapiNews { id: number; title: string; publishDate: string; mainImage?: { url: string; }; }
 
 async function getArtistInfo() {
-  try { const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=*', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
+  try { 
+    // Явно просим отдать фотографию
+    const res = await fetch('http://localhost:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
+    return res.ok ? res.json() : null; 
+  } catch (e) { return null; }
 }
 async function getUpcomingEvents() {
   try {
