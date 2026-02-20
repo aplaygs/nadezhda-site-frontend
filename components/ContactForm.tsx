@@ -42,7 +42,7 @@ export default function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="bg-green-900/30 text-green-400 p-6 rounded-2xl border border-green-900/50 text-center font-medium text-lg">
+      <div className="bg-green-50 text-green-800 p-6 rounded-xl border border-green-200 text-center font-medium text-lg">
         Спасибо! Ваше сообщение успешно отправлено. Мы свяжемся с вами в ближайшее время.
       </div>
     );
@@ -51,34 +51,34 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-zinc-400 mb-1">Имя</label>
+        <label className="block text-sm font-medium text-stone-500 mb-1">Имя</label>
         <input required type="text" name="name" value={formData.name} onChange={handleChange}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-zinc-500 transition" />
+          className="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition shadow-sm" />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-1">Email</label>
+          <label className="block text-sm font-medium text-stone-500 mb-1">Email</label>
           <input required type="email" name="email" value={formData.email} onChange={handleChange}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-zinc-500 transition" />
+            className="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition shadow-sm" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-1">Телефон</label>
+          <label className="block text-sm font-medium text-stone-500 mb-1">Телефон</label>
           <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-zinc-500 transition" />
+            className="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition shadow-sm" />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-400 mb-1">Сообщение</label>
+        <label className="block text-sm font-medium text-stone-500 mb-1">Сообщение</label>
         <textarea required name="message" rows={4} value={formData.message} onChange={handleChange}
-          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-zinc-500 transition resize-none"></textarea>
+          className="w-full bg-stone-50 border border-stone-300 rounded-lg px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition shadow-sm resize-none"></textarea>
       </div>
 
-      {status === 'error' && <p className="text-red-400 text-sm">Произошла ошибка отправки.</p>}
+      {status === 'error' && <p className="text-red-500 text-sm">Произошла ошибка отправки.</p>}
 
       <button type="submit" disabled={status === 'loading'}
-        className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition disabled:opacity-50 mt-4">
+        className="w-full bg-stone-900 text-stone-50 font-medium tracking-wide py-4 rounded-lg hover:bg-amber-800 transition disabled:opacity-50 mt-4 shadow-md">
         {status === 'loading' ? 'Отправка...' : 'Отправить сообщение'}
       </button>
     </form>

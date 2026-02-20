@@ -11,7 +11,6 @@ export default function SubscribeForm() {
     setStatus('loading');
 
     try {
-      // В Strapi POST-запросы должны быть обернуты в объект "data"
       const res = await fetch('http://localhost:1337/api/subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -31,12 +30,12 @@ export default function SubscribeForm() {
   };
 
   return (
-    <div className="bg-zinc-900/50 p-8 rounded-3xl border border-zinc-800 text-center">
-      <h3 className="text-2xl font-bold text-white mb-2">Оставайтесь на связи</h3>
-      <p className="text-zinc-400 mb-6">Подпишитесь на рассылку, чтобы первыми узнавать о новых песнях и концертах.</p>
+    <div className="bg-white p-8 rounded-2xl border border-stone-200 text-center shadow-sm">
+      <h3 className="text-2xl font-serif text-stone-900 mb-2">Оставайтесь на связи</h3>
+      <p className="text-stone-500 mb-6 font-light">Подпишитесь на рассылку, чтобы первыми узнавать о новых песнях и концертах.</p>
       
       {status === 'success' ? (
-        <div className="bg-green-900/30 text-green-400 p-4 rounded-xl border border-green-900/50 font-medium">
+        <div className="bg-green-50 text-green-800 p-4 rounded-xl border border-green-200 font-medium">
           Спасибо за подписку! Ваш email успешно добавлен.
         </div>
       ) : (
@@ -48,12 +47,12 @@ export default function SubscribeForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={status === 'loading'}
-            className="flex-1 bg-zinc-950 border border-zinc-800 rounded-full px-6 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition"
+            className="flex-1 bg-stone-50 border border-stone-300 rounded-full px-6 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-amber-700 transition shadow-sm"
           />
           <button 
             type="submit" 
             disabled={status === 'loading'}
-            className="bg-white text-black font-bold px-8 py-3 rounded-full hover:bg-gray-200 transition disabled:opacity-50"
+            className="bg-stone-900 text-stone-50 font-medium tracking-wide px-8 py-3 rounded-full hover:bg-amber-800 transition disabled:opacity-50 shadow-sm"
           >
             {status === 'loading' ? 'Отправка...' : 'Подписаться'}
           </button>
@@ -61,7 +60,7 @@ export default function SubscribeForm() {
       )}
       
       {status === 'error' && (
-        <p className="text-red-400 text-sm mt-4">Произошла ошибка. Попробуйте еще раз.</p>
+        <p className="text-red-500 text-sm mt-4">Произошла ошибка. Попробуйте еще раз.</p>
       )}
     </div>
   );

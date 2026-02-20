@@ -1,43 +1,65 @@
-'use client'; // Важно! Плеер работает только в браузере (на клиенте)
+'use client';
 
 import { useEffect, useRef } from 'react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 
 export default function AudioPlayer() {
-  // Достаем данные из нашего "мозга"
+  // Достаем ТВОИ правильные функции из стора
   const { currentTrack, isPlaying, pauseTrack, resumeTrack } = usePlayerStore();
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Следим за нажатием кнопок и управляем настоящим тегом <audio>
   useEffect(() => {
-    if (audioRef.current) {
+    if (currentTrack && audioRef.current) {
       if (isPlaying) {
-        audioRef.current.play();
+        // Запускаем с защитой от AbortError
+        audioRef.current.play().catch(e => console.error("Ожидание загрузки аудио...", e));
       } else {
         audioRef.current.pause();
       }
     }
-  }, [isPlaying, currentTrack]);
+  }, [currentTrack, isPlaying]);
 
-  // Если трек не выбран — плеер просто невидим
-  if (!currentTrack) return null; 
+  if (!currentTrack) return null;
+
+  // Правильная функция переключения
+  const togglePlay = () => {
+    if (isPlaying) {
+      pauseTrack();
+    } else {
+      resumeTrack();
+    }
+  };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-zinc-950 border-t border-zinc-800 text-white p-4 flex items-center justify-between z-50">
-      <div className="flex flex-col">
-        <span className="font-bold text-lg">{currentTrack.title}</span>
-        <span className="text-sm text-zinc-400">Надежда Колесникова</span>
+    <div className="fixed bottom-0 left-0 w-full bg-white border-t border-stone-200 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] p-4 z-50">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-4">
+        
+        <div className="flex-1 text-center md:text-left">
+          <p className="font-serif text-lg text-stone-900">{currentTrack.title}</p>
+        </div>
+        
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={togglePlay} 
+            className="w-12 h-12 bg-amber-700 text-white rounded-full flex items-center justify-center hover:bg-amber-800 transition shadow-md"
+          >
+            {isPlaying ? '⏸' : '▶'}
+          </button>
+        </div>
+        
+        <div className="flex-1 w-full text-stone-700">
+          <audio 
+            ref={audioRef} 
+            // Используем .url, как ты передавал в PlayTrackButton
+            src={currentTrack.url} 
+            controls 
+            className="w-full h-10 outline-none" 
+            // По окончании трека ставим на паузу
+            onEnded={() => pauseTrack()} 
+          />
+        </div>
+
       </div>
-      
-      <button 
-        onClick={isPlaying ? pauseTrack : resumeTrack}
-        className="bg-white text-black w-12 h-12 rounded-full flex items-center justify-center font-bold hover:bg-gray-200 transition"
-      >
-        {isPlaying ? 'II' : '▶'}
-      </button>
-      
-      {/* Невидимый технический тег плеера */}
-      <audio ref={audioRef} src={currentTrack.url} />
     </div>
   );
 }

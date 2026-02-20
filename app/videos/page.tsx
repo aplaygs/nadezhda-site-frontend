@@ -1,35 +1,31 @@
-import React from 'react';
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Видео и клипы | Надежда Колесникова",
-  description: "Записи с концертов, клипы и выступления Надежды Колесниковой.",
+export const metadata: Metadata = { 
+  title: "Видео | Надежда Колесникова", 
+  description: "Клипы и концертные записи." 
 };
-// 1. Обновляем интерфейс: меняем rutubeLink/vkVideoLink на единый videoLink
-interface StrapiVideo {
-  id: number;
-  title: string;
-  description?: string;
-  videoLink?: string; // <-- Вот правильное название поля из базы
-  publishDate?: string;
+
+interface StrapiVideo { 
+  id: number; 
+  title: string; 
+  youtubeLink?: string; // Сделали ссылку необязательной (?)
+  description?: string; 
 }
 
 async function getVideos() {
-  try {
-    const res = await fetch('http://127.0.0.1:1337/api/videos?sort=publishDate:desc', {
-      cache: 'no-store'
-    });
-    
-    if (!res.ok) {
-      console.error("Ошибка API. Статус:", res.status);
-      return null;
-    }
-    
-    return res.json();
-  } catch (error) {
-    console.error("Ошибка при запросе API:", error);
-    return null;
-  }
+  try { 
+    const res = await fetch('http://127.0.0.1:1337/api/videos?sort[0]=createdAt:desc', { cache: 'no-store' }); 
+    return res.ok ? res.json() : null; 
+  } catch (e) { return null; }
+}
+
+function getYouTubeEmbedUrl(url?: string) {
+  // ЗАЩИТА: Если ссылки нет, сразу возвращаем null и не ломаем сайт
+  if (!url) return null;
+  
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
 }
 
 export default async function VideosPage() {
@@ -37,58 +33,31 @@ export default async function VideosPage() {
   const videos: StrapiVideo[] = response?.data || [];
 
   return (
-    <main className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-4xl font-bold mb-12 text-center">Видео</h1>
+    <main className="p-8 max-w-6xl mx-auto space-y-16 my-12">
+      <h1 className="text-5xl md:text-7xl font-serif text-stone-900 text-center mb-16">
+        Видео <span className="text-amber-700 italic font-light">и клипы</span>
+      </h1>
       
-      {videos.length === 0 ? (
-        <p className="text-center text-zinc-400">Видео пока не загружены...</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {videos.map((video) => {
-            // 2. Теперь берем ссылку прямо из поля videoLink
-            const embedUrl = video.videoLink;
-
-            return (
-              <div key={video.id} className="bg-zinc-900/40 p-5 rounded-3xl border border-zinc-800 hover:border-zinc-700 transition flex flex-col shadow-lg">
-                
-                {embedUrl ? (
-                  <div className="w-full aspect-video rounded-2xl overflow-hidden bg-zinc-950 mb-5 relative">
-                    <iframe 
-                      src={embedUrl} 
-                      frameBorder="0" 
-                      allow="clipboard-write; autoplay" 
-                      allowFullScreen
-                      className="absolute top-0 left-0 w-full h-full"
-                    ></iframe>
-                  </div>
-                ) : (
-                  <div className="w-full aspect-video rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-500 mb-5">
-                    Нет ссылки на видео
-                  </div>
-                )}
-
-                <h2 className="text-2xl font-bold mb-2 text-zinc-100">{video.title}</h2>
-                
-                {video.publishDate && (
-                  <p className="text-sm text-zinc-500 mb-3 font-medium">
-                    {new Date(video.publishDate).toLocaleDateString('ru-RU', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </p>
-                )}
-                
-                {video.description && (
-                  <p className="text-zinc-400 text-sm leading-relaxed flex-grow">
-                    {video.description}
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        {videos.map((video) => {
+          const embedUrl = getYouTubeEmbedUrl(video.youtubeLink);
+          return (
+            <div key={video.id} className="bg-white border border-stone-100 shadow-sm overflow-hidden p-4">
+              {embedUrl ? (
+                <div className="aspect-video w-full bg-stone-100 mb-6">
+                  <iframe src={embedUrl} allowFullScreen className="w-full h-full border-0"></iframe>
+                </div>
+              ) : (
+                <div className="aspect-video w-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-400 mb-6 italic font-light">
+                  Видео скоро появится
+                </div>
+              )}
+              <h3 className="text-2xl font-serif text-stone-900 mb-2 px-2">{video.title}</h3>
+              {video.description && <p className="text-stone-500 px-2 pb-2 font-light">{video.description}</p>}
+            </div>
+          );
+        })}
+      </div>
     </main>
   );
 }
