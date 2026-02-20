@@ -5,24 +5,14 @@ export const metadata: Metadata = {
   description: "Клипы и концертные записи." 
 };
 
-interface StrapiVideo { 
-  id: number; 
-  title: string; 
-  youtubeLink?: string; // Сделали ссылку необязательной (?)
-  description?: string; 
-}
+interface StrapiVideo { id: number; title: string; youtubeLink?: string; description?: string; }
 
 async function getVideos() {
-  try { 
-    const res = await fetch('http://127.0.0.1:1337/api/videos?sort[0]=createdAt:desc', { cache: 'no-store' }); 
-    return res.ok ? res.json() : null; 
-  } catch (e) { return null; }
+  try { const res = await fetch('http://127.0.0.1:1337/api/videos?sort[0]=createdAt:desc', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
 }
 
 function getYouTubeEmbedUrl(url?: string) {
-  // ЗАЩИТА: Если ссылки нет, сразу возвращаем null и не ломаем сайт
   if (!url) return null;
-  
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
@@ -33,7 +23,8 @@ export default async function VideosPage() {
   const videos: StrapiVideo[] = response?.data || [];
 
   return (
-    <main className="p-8 max-w-6xl mx-auto space-y-16 my-12">
+    // Добавлен класс animate-fade-in-up
+    <main className="p-8 max-w-6xl mx-auto space-y-16 my-12 animate-fade-in-up">
       <h1 className="text-5xl md:text-7xl font-serif text-stone-900 text-center mb-16">
         Видео <span className="text-amber-700 italic font-light">и клипы</span>
       </h1>

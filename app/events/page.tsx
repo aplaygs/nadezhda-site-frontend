@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Афиша концертов | Надежда Колесникова", description: "Расписание ближайших выступлений." };
+export const metadata: Metadata = { 
+  title: "Афиша концертов | Надежда Колесникова", 
+  description: "Расписание ближайших выступлений." 
+};
 
 interface StrapiEvent { id: number; title: string; date: string; city: string; venue: string; description?: string; ticketLink?: string; }
 
@@ -17,8 +20,11 @@ export default async function EventsPage() {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <main className="p-8 max-w-5xl mx-auto space-y-16 my-12">
-      <h1 className="text-5xl md:text-7xl font-serif text-stone-900 text-center mb-16">Афиша <span className="text-amber-700 italic font-light">концертов</span></h1>
+    // Добавлен класс animate-fade-in-up
+    <main className="p-8 max-w-5xl mx-auto space-y-16 my-12 animate-fade-in-up">
+      <h1 className="text-5xl md:text-7xl font-serif text-stone-900 text-center mb-16">
+        Афиша <span className="text-amber-700 italic font-light">концертов</span>
+      </h1>
       
       <section className="space-y-8">
         <h2 className="text-3xl font-serif text-stone-800 border-b border-stone-200 pb-4">Ближайшие выступления</h2>
@@ -37,6 +43,23 @@ export default async function EventsPage() {
           </div>
         )}
       </section>
+
+      {pastEvents.length > 0 && (
+        <section className="space-y-8 mt-16 opacity-70">
+          <h2 className="text-3xl font-serif text-stone-800 border-b border-stone-200 pb-4">Прошедшие концерты</h2>
+          <div className="grid gap-6">
+            {pastEvents.map(event => (
+              <div key={event.id} className="bg-stone-100/50 p-6 border border-stone-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                  <div className="text-stone-500 font-bold mb-2 tracking-widest uppercase text-sm">{formatDate(event.date)}</div>
+                  <h3 className="text-xl font-serif text-stone-600 mb-1">{event.title}</h3>
+                  <div className="text-stone-500 font-light">г. {event.city}, {event.venue}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }

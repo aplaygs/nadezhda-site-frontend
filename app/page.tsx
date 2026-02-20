@@ -28,7 +28,8 @@ export default async function Home() {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 
   return (
-    <main className="p-8 max-w-6xl mx-auto space-y-32 my-12">
+    // Добавлен класс animate-fade-in-up
+    <main className="p-8 max-w-6xl mx-auto space-y-32 my-12 animate-fade-in-up">
       <section className="flex flex-col md:flex-row gap-16 items-center">
         <div className="flex-1 space-y-8">
           <h1 className="text-6xl md:text-8xl font-serif text-stone-900 leading-tight">
@@ -55,17 +56,24 @@ export default async function Home() {
           <h2 className="text-4xl font-serif text-stone-900">Ближайшие концерты</h2>
           <Link href="/events" className="text-stone-500 hover:text-amber-700 transition uppercase text-sm tracking-widest">Вся афиша &rarr;</Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {upcomingEvents.map((event) => (
-            <div key={event.id} className="bg-white p-8 border border-stone-100 shadow-sm hover:shadow-md transition duration-300">
-              <div className="text-amber-700 font-bold mb-3 tracking-widest uppercase text-sm">{formatDate(event.date)}</div>
-              <h3 className="text-2xl font-serif text-stone-900 mb-2">{event.title}</h3>
-              <div className="text-stone-500 mb-6 font-light">г. {event.city}, {event.venue}</div>
-              {event.ticketLink && <a href={event.ticketLink} target="_blank" rel="noreferrer" className="text-sm border border-stone-300 px-6 py-2 hover:bg-amber-800 hover:text-white hover:border-amber-800 transition inline-block">Билеты</a>}
-            </div>
-          ))}
-        </div>
+        
+        {upcomingEvents.length === 0 ? (
+          <p className="text-stone-500 font-light italic">В данный момент нет анонсированных концертов.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {upcomingEvents.map((event) => (
+              <div key={event.id} className="bg-white p-8 border border-stone-100 shadow-sm hover:shadow-md transition duration-300">
+                <div className="text-amber-700 font-bold mb-3 tracking-widest uppercase text-sm">{formatDate(event.date)}</div>
+                <h3 className="text-2xl font-serif text-stone-900 mb-2">{event.title}</h3>
+                <div className="text-stone-500 mb-6 font-light">г. {event.city}, {event.venue}</div>
+                {event.ticketLink && <a href={event.ticketLink} target="_blank" rel="noreferrer" className="text-sm border border-stone-300 px-6 py-2 hover:bg-amber-800 hover:text-white hover:border-amber-800 transition inline-block">Билеты</a>}
+              </div>
+            ))}
+          </div>
+        )}
       </section>
+      
+      {/* Новости вынесены, чтобы код оставался чистым и сфокусированным, как мы обсуждали ранее */}
     </main>
   );
 }

@@ -6,9 +6,23 @@ export const metadata: Metadata = {
   description: "Биография, награды и творческий путь Надежды Колесниковой." 
 };
 
-// Изменили fullBio на any[], так как теперь это массив блоков от Strapi
+// 1. Описываем кусочек текста (может быть жирным или курсивом)
+interface StrapiTextNode {
+  type: string;
+  text: string;
+  bold?: boolean;
+  italic?: boolean;
+}
+
+// 2. Описываем целый абзац (блок), который содержит кусочки текста
+interface StrapiBlockNode {
+  type: string;
+  children?: StrapiTextNode[];
+}
+
+// 3. Обновляем основной интерфейс артиста
 interface StrapiArtistInfo { 
-  fullBio?: any[]; 
+  fullBio?: StrapiBlockNode[]; 
   shortBio?: string; 
   mainPhoto?: { url: string; }; 
 }
@@ -26,7 +40,7 @@ export default async function AboutPage() {
   const photoUrl = artistInfo.mainPhoto?.url ? `http://localhost:1337${artistInfo.mainPhoto.url}` : null;
 
   return (
-    <main className="p-8 max-w-4xl mx-auto my-12 space-y-16">
+    <main className="p-8 max-w-4xl mx-auto my-12 space-y-16 animate-fade-in-up">
       <h1 className="text-5xl md:text-7xl font-serif text-stone-900 text-center mb-12">
         О <span className="text-amber-700 italic font-light">певице</span>
       </h1>
@@ -40,10 +54,11 @@ export default async function AboutPage() {
       <div className="bg-white p-10 md:p-16 border border-stone-100 shadow-sm text-lg text-stone-700 leading-relaxed font-light">
         {artistInfo.fullBio && Array.isArray(artistInfo.fullBio) ? (
           <div className="space-y-4">
-            {/* Умный парсер: перебираем блоки и вытаскиваем из них текст */}
-            {artistInfo.fullBio.map((block: any, index: number) => (
+            {/* Теперь TypeScript знает, что block - это StrapiBlockNode */}
+            {artistInfo.fullBio.map((block: StrapiBlockNode, index: number) => (
               <p key={index}>
-                {block.children?.map((child: any, cIndex: number) => (
+                {/* А child - это StrapiTextNode */}
+                {block.children?.map((child: StrapiTextNode, cIndex: number) => (
                   <span key={cIndex} className={child.bold ? 'font-bold' : child.italic ? 'italic' : ''}>
                     {child.text}
                   </span>

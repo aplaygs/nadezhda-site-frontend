@@ -1,115 +1,102 @@
 import Image from 'next/image';
+import type { Metadata } from "next";
 import PlayTrackButton from '@/components/music/PlayTrackButton';
 
-import type { Metadata } from "next";
-
 export const metadata: Metadata = {
-  title: "Дискография | Надежда Колесникова",
-  description: "Слушать песни и романсы в исполнении Надежды Колесниковой. Официальная дискография.",
+  title: "Музыка | Надежда Колесникова",
+  description: "Официальная дискография, альбомы и синглы.",
 };
-// 1. Исправляем audio на audioFile
+
 interface StrapiTrack {
   id: number;
   title: string;
-  duration?: string;
-  audioFile?: {
-    url: string;
-  };
+  audioFile?: { url: string; };
 }
 
 interface StrapiRelease {
   id: number;
   title: string;
-  type: string;
-  cover?: {
-    url: string;
-  };
+  releaseDate: string;
+  cover?: { url: string; };
   tracks?: StrapiTrack[];
 }
 
-async function getMusicReleases() {
+async function getReleases() {
   try {
-    // Железобетонный синтаксис массивов для Strapi v5
-    const res = await fetch(
-      'http://127.0.0.1:1337/api/music-releases?populate[0]=cover&populate[1]=tracks.audioFile', 
-      { cache: 'no-store' }
-    );
-    
-    if (!res.ok) {
-      console.error("Ошибка API. Статус:", res.status);
-      return null;
-    }
-    
-    return res.json();
-  } catch (error) {
-    console.error("Ошибка при запросе API:", error);
-    return null;
-  }
+    // Получаем релизы вместе с обложками и файлами треков, сортируем от новых к старым
+    const res = await fetch('http://127.0.0.1:1337/api/music-releases?populate=cover,tracks.audioFile&sort[0]=releaseDate:desc', { cache: 'no-store' });
+    return res.ok ? res.json() : null;
+  } catch (e) { return null; }
 }
 
 export default async function MusicPage() {
-  const response = await getMusicReleases();
+  const response = await getReleases();
   const releases: StrapiRelease[] = response?.data || [];
 
   return (
-    <main className="p-8 max-w-5xl mx-auto">
-      <h1 className="text-4xl font-bold mb-12 text-center">Дискография</h1>
-      
+    // Добавляем класс анимации появления (настроим его на следующем шаге)
+    <main className="p-8 max-w-5xl mx-auto space-y-32 my-12 animate-fade-in-up">
+      <h1 className="text-5xl md:text-7xl font-serif text-stone-900 text-center mb-24">
+        Музыкальная <span className="text-amber-700 italic font-light">коллекция</span>
+      </h1>
+
       {releases.length === 0 ? (
-        <p className="text-center text-zinc-400">Музыка пока не загружена...</p>
+        <p className="text-center text-stone-500 font-light italic text-xl">Релизы скоро появятся...</p>
       ) : (
-        <div className="space-y-16">
+        <div className="space-y-32">
           {releases.map((release) => {
             const coverUrl = release.cover?.url ? `http://localhost:1337${release.cover.url}` : null;
-            const tracks = release.tracks || [];
+            const releaseYear = new Date(release.releaseDate).getFullYear();
 
             return (
-              <div key={release.id} className="flex flex-col md:flex-row gap-8 bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800 hover:border-zinc-700 transition">
+              <section key={release.id} className="flex flex-col md:flex-row gap-16 items-start group">
                 
-                <div className="w-full md:w-64 shrink-0">
+                {/* Обложка альбома с эффектом тени и смещения */}
+                <div className="w-full md:w-1/3 shrink-0 relative">
+                  <div className="absolute inset-0 bg-stone-200/50 translate-x-4 translate-y-4 -z-10 transition-transform duration-700 group-hover:translate-x-6 group-hover:translate-y-6"></div>
                   {coverUrl ? (
                     <Image 
                       src={coverUrl} 
                       alt={release.title} 
-                      width={300} 
-                      height={300} 
-                      className="rounded-xl shadow-2xl w-full object-cover aspect-square" 
+                      width={500} height={500} 
+                      className="w-full h-auto shadow-[0_10px_40px_rgba(0,0,0,0.1)]" 
                     />
                   ) : (
-                    <div className="w-full aspect-square bg-zinc-800 rounded-xl flex items-center justify-center text-zinc-500">
-                      Нет обложки
+                    <div className="w-full aspect-square bg-white flex items-center justify-center text-stone-400 font-serif text-xl border border-stone-200 shadow-sm">
+                      {release.title}
                     </div>
                   )}
                 </div>
 
-                <div className="flex-1">
-                  <h2 className="text-3xl font-bold mb-2">{release.title}</h2>
-                  <p className="text-zinc-400 mb-6 uppercase text-sm tracking-wider">
-                    {release.type}
-                  </p>
-                  
-                  <div className="space-y-1">
-                    {tracks.length === 0 ? (
-                      <p className="text-sm text-zinc-500">В этом релизе пока нет треков.</p>
-                    ) : (
-                      tracks.map((track, index) => (
-                        <div 
-                          key={track.id} 
-                          className="flex items-center justify-between p-3 hover:bg-zinc-800/60 rounded-lg transition group"
-                        >
-                          <div className="flex items-center gap-4">
-                            <span className="text-zinc-600 w-4 text-sm">{index + 1}</span>
-                            <PlayTrackButton track={track} />
-                            <span className="font-medium text-zinc-200">{track.title}</span>
-                          </div>
-                          <span className="text-zinc-500 text-sm">{track.duration || '--:--'}</span>
+                {/* Трек-лист */}
+                <div className="w-full md:w-2/3 space-y-10 mt-4 md:mt-0">
+                  <div className="border-b border-stone-200 pb-6">
+                    <h2 className="text-4xl font-serif text-stone-900 mb-2">{release.title}</h2>
+                    <p className="text-amber-700 tracking-widest uppercase text-sm font-medium">{releaseYear}</p>
+                  </div>
+
+                  <div className="flex flex-col">
+                    {release.tracks?.map((track, index) => (
+                      <div 
+                        key={track.id} 
+                        className="py-5 border-b border-stone-100 flex items-center justify-between hover:bg-white transition duration-300 px-4 -mx-4 rounded-lg group/track"
+                      >
+                        <div className="flex items-center gap-6">
+                          <span className="text-stone-300 font-mono text-sm w-4">{String(index + 1).padStart(2, '0')}</span>
+                          <span className="text-xl font-serif text-stone-800">{track.title}</span>
                         </div>
-                      ))
+                        {/* Твоя рабочая кнопка плеера */}
+                        <div className="opacity-0 group-hover/track:opacity-100 transition duration-300">
+                          <PlayTrackButton track={track} />
+                        </div>
+                      </div>
+                    ))}
+                    {(!release.tracks || release.tracks.length === 0) && (
+                      <p className="text-stone-400 italic font-light">Трек-лист формируется...</p>
                     )}
                   </div>
                 </div>
-
-              </div>
+              </section>
             );
           })}
         </div>
