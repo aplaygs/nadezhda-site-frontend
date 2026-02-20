@@ -7,13 +7,14 @@ export const metadata: Metadata = {
   description: "Официальная дискография, альбомы и синглы.",
 };
 
+// ИСПРАВЛЕНО: audioFile
 interface StrapiTrack { id: number; title: string; audioFile?: { url: string; }; }
 interface StrapiRelease { id: number; title: string; releaseDate: string; cover?: { url: string; }; tracks?: StrapiTrack[]; }
 
 async function getReleases() {
   try {
-    // ВАЖНО: Специальный запрос для Strapi v5 (глубокий парсинг)
-    const res = await fetch('http://localhost:1337/api/music-releases?populate[cover]=*&populate[tracks][populate]=audioFile&sort[0]=releaseDate:desc', { cache: 'no-store' });
+    // ИСПРАВЛЕНО: Глубокий populate для audioFile
+    const res = await fetch('http://127.0.0.1:1337/api/music-releases?populate[cover]=*&populate[tracks][populate]=audioFile&sort[0]=releaseDate:desc', { cache: 'no-store' });
     return res.ok ? res.json() : null;
   } catch (e) { return null; }
 }
@@ -33,7 +34,7 @@ export default async function MusicPage() {
       ) : (
         <div className="space-y-32">
           {releases.map((release) => {
-            const coverUrl = release.cover?.url ? `http://localhost:1337${release.cover.url}` : null;
+            const coverUrl = release.cover?.url ? `http://127.0.0.1:1337${release.cover.url}` : null;
             const releaseYear = new Date(release.releaseDate).getFullYear();
 
             return (

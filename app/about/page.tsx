@@ -6,31 +6,14 @@ export const metadata: Metadata = {
   description: "Биография, награды и творческий путь Надежды Колесниковой." 
 };
 
-// 1. Описываем кусочек текста (может быть жирным или курсивом)
-interface StrapiTextNode {
-  type: string;
-  text: string;
-  bold?: boolean;
-  italic?: boolean;
-}
-
-// 2. Описываем целый абзац (блок), который содержит кусочки текста
-interface StrapiBlockNode {
-  type: string;
-  children?: StrapiTextNode[];
-}
-
-// 3. Обновляем основной интерфейс артиста
-interface StrapiArtistInfo { 
-  fullBio?: StrapiBlockNode[]; 
-  shortBio?: string; 
-  mainPhoto?: { url: string; }; 
-}
+interface StrapiTextNode { type: string; text: string; bold?: boolean; italic?: boolean; }
+interface StrapiBlockNode { type: string; children?: StrapiTextNode[]; }
+interface StrapiArtistInfo { fullBio?: StrapiBlockNode[]; shortBio?: string; mainPhoto?: { url: string; }; }
 
 async function getArtistInfo() {
   try { 
-    // ВАЖНО: Мы поменяли populate на mainPhoto для корректной работы Strapi v5
-    const res = await fetch('http://localhost:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
+    // Явный запрос на mainPhoto
+    const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
     return res.ok ? res.json() : null; 
   } catch (e) { return null; }
 }
@@ -38,7 +21,8 @@ async function getArtistInfo() {
 export default async function AboutPage() {
   const response = await getArtistInfo();
   const artistInfo: StrapiArtistInfo = response?.data || {};
-  const photoUrl = artistInfo.mainPhoto?.url ? `http://localhost:1337${artistInfo.mainPhoto.url}` : null;
+  // И здесь 127.0.0.1
+  const photoUrl = artistInfo.mainPhoto?.url ? `http://127.0.0.1:1337${artistInfo.mainPhoto.url}` : null;
 
   return (
     <main className="p-8 max-w-4xl mx-auto my-12 space-y-16 animate-fade-in-up">
@@ -55,10 +39,8 @@ export default async function AboutPage() {
       <div className="bg-white p-10 md:p-16 border border-stone-100 shadow-sm text-lg text-stone-700 leading-relaxed font-light">
         {artistInfo.fullBio && Array.isArray(artistInfo.fullBio) ? (
           <div className="space-y-4">
-            {/* Теперь TypeScript знает, что block - это StrapiBlockNode */}
             {artistInfo.fullBio.map((block: StrapiBlockNode, index: number) => (
               <p key={index}>
-                {/* А child - это StrapiTextNode */}
                 {block.children?.map((child: StrapiTextNode, cIndex: number) => (
                   <span key={cIndex} className={child.bold ? 'font-bold' : child.italic ? 'italic' : ''}>
                     {child.text}

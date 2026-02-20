@@ -7,8 +7,8 @@ interface StrapiNews { id: number; title: string; publishDate: string; mainImage
 
 async function getArtistInfo() {
   try { 
-    // Явно просим отдать фотографию
-    const res = await fetch('http://localhost:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
+    // Явный запрос на mainPhoto
+    const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=mainPhoto', { cache: 'no-store' }); 
     return res.ok ? res.json() : null; 
   } catch (e) { return null; }
 }
@@ -27,12 +27,12 @@ export default async function Home() {
   const [artistRes, upcomingEventsData, newsRes] = await Promise.all([getArtistInfo(), getUpcomingEvents(), getLatestNews()]);
   const artistInfo: StrapiArtistInfo = artistRes?.data || {};
   const upcomingEvents: StrapiEvent[] = upcomingEventsData || [];
-  const news: StrapiNews[] = newsRes?.data || [];
-  const photoUrl = artistInfo.mainPhoto?.url ? `http://localhost:1337${artistInfo.mainPhoto.url}` : null;
+  
+  // Возвращаем 127.0.0.1 для ссылки на картинку
+  const photoUrl = artistInfo.mainPhoto?.url ? `http://127.0.0.1:1337${artistInfo.mainPhoto.url}` : null;
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 
   return (
-    // Добавлен класс animate-fade-in-up
     <main className="p-8 max-w-6xl mx-auto space-y-32 my-12 animate-fade-in-up">
       <section className="flex flex-col md:flex-row gap-16 items-center">
         <div className="flex-1 space-y-8">
@@ -76,8 +76,6 @@ export default async function Home() {
           </div>
         )}
       </section>
-      
-      {/* Новости вынесены, чтобы код оставался чистым и сфокусированным, как мы обсуждали ранее */}
     </main>
   );
 }
