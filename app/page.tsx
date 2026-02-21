@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import NewsCard from '@/components/NewsCard';
 
 interface StrapiArtistInfo { fullBio?: string; shortBio?: string; mainPhoto?: { url: string; }; }
 interface StrapiEvent { id: number; title: string; date: string; city: string; venue: string; ticketLink?: string; }
-interface StrapiNews { id: number; title: string; publishDate: string; mainImage?: { url: string; }; }
+interface StrapiNews { id: number; title: string; publishDate: string; content?: any[]; mainImage?: { url: string; }; }
 
 async function getArtistInfo() {
   try { const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=*', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
@@ -16,13 +17,17 @@ async function getUpcomingEvents() {
   } catch (e) { return null; }
 }
 async function getLatestNews() {
-  try { const res = await fetch('http://127.0.0.1:1337/api/news-posts?sort=publishDate:desc&pagination[limit]=2&populate=mainImage', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
+  try { 
+    const res = await fetch('http://127.0.0.1:1337/api/news-posts?sort=publishDate:desc&pagination[limit]=2&populate=mainImage', { cache: 'no-store' }); 
+    return res.ok ? res.json() : null; 
+  } catch (e) { return null; }
 }
 
 export default async function Home() {
   const [artistRes, upcomingEventsData, newsRes] = await Promise.all([getArtistInfo(), getUpcomingEvents(), getLatestNews()]);
   const artistInfo: StrapiArtistInfo = artistRes?.data || {};
   const upcomingEvents: StrapiEvent[] = upcomingEventsData || [];
+  const latestNews: StrapiNews[] = newsRes?.data || [];
   
   const photoUrl = artistInfo.mainPhoto?.url ? `http://127.0.0.1:1337${artistInfo.mainPhoto.url}` : null;
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
@@ -51,12 +56,7 @@ export default async function Home() {
         
         {photoUrl && (
           <div className="w-full md:w-5/12">
-            <Image 
-              src={photoUrl} alt="Надежда Колесникова" 
-              width={600} height={800} 
-              className="w-full h-auto object-cover rounded-2xl shadow-md" 
-              priority 
-            />
+            <Image src={photoUrl} alt="Надежда Колесникова" width={600} height={800} className="w-full h-auto object-cover rounded-2xl shadow-md" priority />
           </div>
         )}
       </section>
@@ -72,21 +72,41 @@ export default async function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {upcomingEvents.map((event) => (
-              <div key={event.id} className="bg-stone-50 p-8 border border-stone-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
-                <div className="text-amber-700 font-bold mb-3 tracking-widest uppercase text-sm">{formatDate(event.date)}</div>
-                <h3 className="text-2xl font-serif text-stone-900 mb-2">{event.title}</h3>
-                <div className="text-stone-500 mb-6 font-light">г. {event.city}, {event.venue}</div>
-                {/* ИЗМЕНЕНО: Дорогая кнопка "Билеты" */}
+              <div key={event.id} className="bg-stone-50 p-8 border border-stone-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full justify-between gap-6">
+                <div>
+                  <div className="text-amber-700 font-bold mb-3 tracking-widest uppercase text-sm">{formatDate(event.date)}</div>
+                  <h3 className="text-2xl font-serif text-stone-900 mb-2">{event.title}</h3>
+                  <div className="text-stone-500 font-light">г. {event.city}, {event.venue}</div>
+                </div>
                 {event.ticketLink && (
-                  <a href={event.ticketLink} target="_blank" rel="noreferrer" className="inline-block bg-stone-900 text-stone-50 px-8 py-3 rounded-full hover:bg-amber-700 hover:shadow-[0_5px_15px_rgba(180,83,9,0.3)] hover:-translate-y-0.5 transition-all duration-300 text-xs uppercase tracking-widest font-medium">
-                    Билеты
-                  </a>
+                  <div className="mt-auto pt-4">
+                    <a href={event.ticketLink} target="_blank" rel="noreferrer" className="inline-block bg-stone-900 text-stone-50 px-8 py-3 rounded-full hover:bg-amber-700 hover:shadow-[0_5px_15px_rgba(180,83,9,0.3)] hover:-translate-y-0.5 transition-all duration-300 text-xs uppercase tracking-widest font-medium">
+                      Билеты
+                    </a>
+                  </div>
                 )}
               </div>
             ))}
           </div>
         )}
       </section>
+
+      {latestNews.length > 0 && (
+        <section>
+          <div className="flex justify-between items-end mb-12 border-b border-stone-200 pb-4">
+            <h2 className="text-4xl font-serif text-stone-900">Блог и новости</h2>
+            <Link href="/news" className="text-stone-500 hover:text-amber-700 transition uppercase text-sm tracking-widest">Все новости &rarr;</Link>
+          </div>
+          
+          {/* ИСПРАВЛЕНИЕ: items-start не дает карточкам растягиваться друг под друга */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            {latestNews.map((post) => (
+              <NewsCard key={post.id} post={post} />
+            ))}
+          </div>
+        </section>
+      )}
+
     </main>
   );
 }

@@ -16,6 +16,7 @@ export default function Header() {
     { href: '/music', label: 'Музыка' },
     { href: '/videos', label: 'Видео' },
     { href: '/events', label: 'Афиша' },
+    { href: '/news', label: 'Новости' }, // <-- ДОБАВИЛИ НОВОСТИ
     { href: '/contacts', label: 'Контакты' },
   ];
 
