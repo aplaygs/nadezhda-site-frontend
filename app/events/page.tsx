@@ -3,7 +3,13 @@ import EventCard from "@/components/EventCard";
 
 export const metadata: Metadata = { 
   title: "Афиша концертов | Надежда Колесникова", 
-  description: "Расписание ближайших выступлений." 
+  description: "Расписание предстоящих выступлений, концертов и творческих вечеров Надежды Колесниковой. Билеты онлайн.",
+  openGraph: {
+    title: "Афиша концертов | Надежда Колесникова",
+    description: "Расписание предстоящих выступлений, концертов и творческих вечеров. Билеты онлайн.",
+    url: "https://nadezhda-kolesnikova.ru/events",
+    type: "website",
+  },
 };
 
 interface StrapiEvent { id: number; title: string; date: string; city: string; venue: string; description?: string; ticketLink?: string; }

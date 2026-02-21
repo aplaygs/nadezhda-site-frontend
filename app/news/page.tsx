@@ -2,15 +2,24 @@ import type { Metadata } from "next";
 import NewsCard from "@/components/NewsCard";
 
 export const metadata: Metadata = { 
-  title: "Новости | Надежда Колесникова", 
-  description: "Последние события, релизы и статьи." 
+  title: "Новости и Блог | Надежда Колесникова", 
+  description: "Последние события, анонсы релизов и статьи о творческом пути Надежды Колесниковой.",
+  openGraph: {
+    title: "Новости и Блог | Надежда Колесникова",
+    description: "Последние события, анонсы релизов и статьи о творческом пути.",
+    url: "https://nadezhda-kolesnikova.ru/news",
+    type: "website",
+  },
 };
+
+interface StrapiTextNode { type: string; text: string; bold?: boolean; italic?: boolean; }
+interface StrapiBlockNode { type: string; children?: StrapiTextNode[]; }
 
 interface StrapiNews {
   id: number;
   title: string;
   publishDate: string;
-  content?: any[];
+  content?: StrapiBlockNode[];
   mainImage?: { url: string };
 }
 

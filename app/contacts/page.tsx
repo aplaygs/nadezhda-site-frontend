@@ -5,6 +5,12 @@ import SubscribeForm from "@/components/forms/SubscribeForm";
 export const metadata: Metadata = {
   title: "Контакты | Надежда Колесникова",
   description: "Связь с официальным представителем, организация концертов и сотрудничество.",
+  openGraph: {
+    title: "Контакты | Надежда Колесникова",
+    description: "Организация концертов, сотрудничество и связь с представителем.",
+    url: "https://nadezhda-kolesnikova.ru/contacts",
+    type: "website",
+  },
 };
 
 export default function ContactsPage() {

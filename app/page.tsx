@@ -1,13 +1,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import NewsCard from '@/components/NewsCard';
+import type { Metadata } from "next";
 
-interface StrapiArtistInfo { fullBio?: string; shortBio?: string; mainPhoto?: { url: string; }; }
+interface StrapiTextNode { type: string; text: string; bold?: boolean; italic?: boolean; }
+interface StrapiBlockNode { type: string; children?: StrapiTextNode[]; }
+interface StrapiSEO { metaTitle?: string; metaDescription?: string; shareImage?: { url: string }; }
+
+interface StrapiArtistInfo { fullBio?: string; shortBio?: string; mainPhoto?: { url: string; }; seo?: StrapiSEO; }
 interface StrapiEvent { id: number; title: string; date: string; city: string; venue: string; ticketLink?: string; }
-interface StrapiNews { id: number; title: string; publishDate: string; content?: any[]; mainImage?: { url: string; }; }
+interface StrapiNews { id: number; title: string; publishDate: string; content?: StrapiBlockNode[]; mainImage?: { url: string; }; }
 
+// Берем и фото, и SEO-картинку
 async function getArtistInfo() {
-  try { const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate=*', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
+  try { const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate[0]=mainPhoto&populate[1]=seo.shareImage', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
 }
 async function getUpcomingEvents() {
   try {
@@ -17,10 +23,32 @@ async function getUpcomingEvents() {
   } catch (e) { return null; }
 }
 async function getLatestNews() {
-  try { 
-    const res = await fetch('http://127.0.0.1:1337/api/news-posts?sort=publishDate:desc&pagination[limit]=2&populate=mainImage', { cache: 'no-store' }); 
-    return res.ok ? res.json() : null; 
-  } catch (e) { return null; }
+  try { const res = await fetch('http://127.0.0.1:1337/api/news-posts?sort=publishDate:desc&pagination[limit]=2&populate=mainImage', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
+}
+
+// ДИНАМИЧЕСКОЕ SEO (Тянется из админки)
+export async function generateMetadata(): Promise<Metadata> {
+  const response = await getArtistInfo();
+  const seo = response?.data?.seo;
+
+  if (!seo) {
+    return {
+      title: "Надежда Колесникова | Официальный сайт",
+      description: "Официальный сайт исполнительницы народных песен и романсов Надежды Колесниковой.",
+    };
+  }
+
+  return {
+    title: seo.metaTitle || "Надежда Колесникова | Официальный сайт",
+    description: seo.metaDescription,
+    openGraph: {
+      title: seo.metaTitle,
+      description: seo.metaDescription,
+      images: seo.shareImage?.url ? [`http://127.0.0.1:1337${seo.shareImage.url}`] : [],
+      url: "https://nadezhda-kolesnikova.ru",
+      type: "website",
+    },
+  };
 }
 
 export default async function Home() {
@@ -98,7 +126,6 @@ export default async function Home() {
             <Link href="/news" className="text-stone-500 hover:text-amber-700 transition uppercase text-sm tracking-widest">Все новости &rarr;</Link>
           </div>
           
-          {/* ИСПРАВЛЕНИЕ: items-start не дает карточкам растягиваться друг под друга */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             {latestNews.map((post) => (
               <NewsCard key={post.id} post={post} />

@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { 
-  title: "Видео | Надежда Колесникова", 
-  description: "Клипы и концертные записи." 
+export const metadata: Metadata = {
+  title: "Видео и Клипы | Надежда Колесникова",
+  description: "Официальные видеоклипы, записи с концертов и телевизионных эфиров Надежды Колесниковой.",
+  openGraph: {
+    title: "Видео и Клипы | Надежда Колесникова",
+    description: "Официальные видеоклипы, записи с концертов и телевизионных эфиров.",
+    url: "https://nadezhda-kolesnikova.ru/videos",
+    type: "website",
+  },
 };
 
 // ИСПРАВЛЕНО НА videoLink

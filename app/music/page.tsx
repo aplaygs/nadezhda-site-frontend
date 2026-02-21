@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 import ReleaseCard from "@/components/music/ReleaseCard";
 
 export const metadata: Metadata = {
-  title: "Музыка | Надежда Колесникова",
-  description: "Официальная дискография, альбомы и синглы.",
+  title: "Музыка и Дискография | Надежда Колесникова",
+  description: "Слушайте официальные альбомы, синглы и романсы в исполнении Надежды Колесниковой. Полная музыкальная коллекция.",
+  openGraph: {
+    title: "Музыка и Дискография | Надежда Колесникова",
+    description: "Официальные альбомы, синглы и романсы. Слушать онлайн.",
+    url: "https://nadezhda-kolesnikova.ru/music",
+    type: "website",
+  },
 };
 
 interface StrapiTrack { id: number; title: string; audioFile?: { url: string; }; }
