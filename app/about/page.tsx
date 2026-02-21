@@ -10,8 +10,7 @@ interface StrapiArtistInfo { fullBio?: StrapiBlockNode[]; shortBio?: string; mai
 // Общая функция получения данных (Next.js автоматически кеширует и не делает двойной запрос к базе)
 async function getArtistInfo() {
   try { 
-    // В Strapi v5 используем точечную нотацию для глубокого получения SEO-картинки
-    const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate[0]=mainPhoto&populate[1]=seo.shareImage', { cache: 'no-store' }); 
+    const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate[0]=mainPhoto&populate[1]=seo.shareImage', { next: { revalidate: 3600 } }); 
     return res.ok ? res.json() : null; 
   } catch (e) { return null; }
 }

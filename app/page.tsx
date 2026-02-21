@@ -11,19 +11,18 @@ interface StrapiArtistInfo { fullBio?: string; shortBio?: string; mainPhoto?: { 
 interface StrapiEvent { id: number; title: string; date: string; city: string; venue: string; ticketLink?: string; }
 interface StrapiNews { id: number; title: string; publishDate: string; content?: StrapiBlockNode[]; mainImage?: { url: string; }; }
 
-// Берем и фото, и SEO-картинку
 async function getArtistInfo() {
-  try { const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate[0]=mainPhoto&populate[1]=seo.shareImage', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
+  try { const res = await fetch('http://127.0.0.1:1337/api/artist-info?populate[0]=mainPhoto&populate[1]=seo.shareImage', { next: { revalidate: 3600 } }); return res.ok ? res.json() : null; } catch (e) { return null; }
 }
 async function getUpcomingEvents() {
   try {
-    const res = await fetch('http://127.0.0.1:1337/api/events?sort=date:asc', { cache: 'no-store' });
+    const res = await fetch('http://127.0.0.1:1337/api/events?sort=date:asc', { next: { revalidate: 3600 } });
     if (!res.ok) return null; const json = await res.json(); const now = new Date();
     return (json.data || []).filter((e: StrapiEvent) => new Date(e.date) >= now).slice(0, 2);
   } catch (e) { return null; }
 }
 async function getLatestNews() {
-  try { const res = await fetch('http://127.0.0.1:1337/api/news-posts?sort=publishDate:desc&pagination[limit]=2&populate=mainImage', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
+  try { const res = await fetch('http://127.0.0.1:1337/api/news-posts?sort=publishDate:desc&pagination[limit]=2&populate=mainImage', { next: { revalidate: 3600 } }); return res.ok ? res.json() : null; } catch (e) { return null; }
 }
 
 // ДИНАМИЧЕСКОЕ SEO (Тянется из админки)

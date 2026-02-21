@@ -15,10 +15,7 @@ export const metadata: Metadata = {
 interface StrapiVideo { id: number; title: string; videoLink?: string; description?: string; }
 
 async function getVideos() {
-  try { 
-    const res = await fetch('http://127.0.0.1:1337/api/videos?sort[0]=createdAt:desc', { cache: 'no-store' }); 
-    return res.ok ? res.json() : null; 
-  } catch (e) { return null; }
+  try { const res = await fetch('http://127.0.0.1:1337/api/videos?sort=publishDate:desc', { next: { revalidate: 3600 } }); return res.ok ? res.json() : null; } catch (e) { return null; }
 }
 
 function getVideoEmbedUrl(url?: string) {

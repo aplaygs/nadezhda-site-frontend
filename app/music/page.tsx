@@ -17,7 +17,7 @@ interface StrapiRelease { id: number; title: string; releaseDate: string; cover?
 
 async function getReleases() {
   try {
-    const res = await fetch('http://127.0.0.1:1337/api/music-releases?populate[0]=cover&populate[1]=tracks.audioFile&sort=releaseDate:desc', { cache: 'no-store' });
+    const res = await fetch('http://127.0.0.1:1337/api/music-releases?populate[0]=cover&populate[1]=tracks.audioFile&sort=releaseDate:desc', { next: { revalidate: 3600 } });
     return res.ok ? res.json() : null;
   } catch (e) { return null; }
 }

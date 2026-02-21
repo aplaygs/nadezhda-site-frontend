@@ -25,7 +25,7 @@ interface StrapiNews {
 
 async function getNews() {
   try { 
-    const res = await fetch('http://127.0.0.1:1337/api/news-posts?populate=mainImage&sort=publishDate:desc', { cache: 'no-store' }); 
+    const res = await fetch('http://127.0.0.1:1337/api/news-posts?populate=mainImage&sort=publishDate:desc', { next: { revalidate: 3600 } }); 
     return res.ok ? res.json() : null; 
   } catch (e) { return null; }
 }

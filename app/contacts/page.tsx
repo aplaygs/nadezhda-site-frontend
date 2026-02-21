@@ -57,8 +57,7 @@ export default function ContactsPage() {
 
         {/* Правая колонка: Форма обратной связи */}
         <div className="bg-white p-10 md:p-14 border border-stone-100 shadow-[0_8px_40px_rgba(0,0,0,0.04)] relative">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-700 to-amber-500"></div>
-          <h3 className="text-3xl font-serif text-stone-900 mb-2">Написать сообщение</h3>
+        <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-700 to-amber-500"></div>          <h3 className="text-3xl font-serif text-stone-900 mb-2">Написать сообщение</h3>
           <p className="text-stone-500 font-light mb-8">Оставьте свои контактные данные, и мы свяжемся с вами в ближайшее время.</p>
           <ContactForm />
         </div>

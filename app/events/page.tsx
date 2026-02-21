@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 interface StrapiEvent { id: number; title: string; date: string; city: string; venue: string; description?: string; ticketLink?: string; }
 
 async function getEvents() {
-  try { const res = await fetch('http://127.0.0.1:1337/api/events?sort=date:asc', { cache: 'no-store' }); return res.ok ? res.json() : null; } catch (e) { return null; }
+  try { const res = await fetch('http://127.0.0.1:1337/api/events?sort=date:asc', { next: { revalidate: 600 } }); return res.ok ? res.json() : null; } catch (e) { return null; }
 }
 
 export default async function EventsPage() {
