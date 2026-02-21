@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePlayerStore } from '@/store/usePlayerStore';
 
-// Помощник для форматирования времени (например: 01:23)
 const formatTime = (time: number) => {
   if (isNaN(time) || time < 0) return "00:00";
   const minutes = Math.floor(time / 60);
@@ -21,11 +20,8 @@ export default function AudioPlayer() {
 
   useEffect(() => {
     if (currentTrack && audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch(() => {});
-      } else {
-        audioRef.current.pause();
-      }
+      if (isPlaying) audioRef.current.play().catch(() => {});
+      else audioRef.current.pause();
     }
   }, [currentTrack, isPlaying]);
 
@@ -44,18 +40,14 @@ export default function AudioPlayer() {
     }
   };
 
-  // Правильная функция шаринга прямой ссылки на аудиофайл
   const handleShare = async () => {
     if (!currentTrack) return;
     try {
       await navigator.clipboard.writeText(currentTrack.url);
-      alert('Прямая ссылка на аудиофайл скопирована в буфер обмена!');
-    } catch (e) {
-      console.error('Ошибка копирования', e);
-    }
+      alert('Прямая ссылка на трек скопирована!');
+    } catch (e) { console.error('Ошибка копирования', e); }
   };
 
-  // Правильная функция принудительного скачивания файла
   const handleDownload = async () => {
     if (!currentTrack || isDownloading) return;
     setIsDownloading(true);
@@ -72,7 +64,7 @@ export default function AudioPlayer() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      alert("Не удалось скачать файл. Попробуйте позже.");
+      alert("Ошибка скачивания файла.");
     } finally {
       setIsDownloading(false);
     }
@@ -84,67 +76,73 @@ export default function AudioPlayer() {
   const progressPercent = duration ? (progress / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-white border-t border-stone-200 shadow-[0_-5px_20px_rgba(0,0,0,0.03)] z-50">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center gap-6 md:gap-10">
+    <div className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-xl border-t border-stone-200 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] z-[90] animate-fade-in-up">
+      
+      {/* === ШКАЛА ДЛЯ МОБИЛОК === */}
+      <div className="md:hidden absolute top-0 left-0 w-full h-1.5 bg-stone-100">
+        <div className="h-full bg-amber-700 pointer-events-none transition-all duration-100 ease-linear" style={{ width: `${progressPercent}%` }}></div>
+        <input 
+          type="range" min={0} max={duration || 100} value={progress} 
+          onChange={handleSeek} 
+          className="absolute top-1/2 left-0 w-full h-10 -translate-y-1/2 opacity-0 cursor-pointer z-10"
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center justify-between gap-3 sm:gap-4">
         
-        {/* Кнопка Play/Pause (Идеально по центру) */}
+        {/* Кнопка Play/Pause (ИСПРАВЛЕНО: убран translate-x-0.5) */}
         <button 
           onClick={togglePlay} 
-          className="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-stone-900 text-white hover:bg-amber-700 transition-colors focus:outline-none"
+          className="w-10 h-10 md:w-12 md:h-12 shrink-0 flex items-center justify-center rounded-full bg-stone-900 text-white hover:bg-amber-700 hover:scale-105 transition-all shadow-md focus:outline-none"
         >
           {isPlaying ? (
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
           ) : (
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           )}
         </button>
 
-        {/* Информация о треке */}
-        <div className="hidden sm:block w-48 flex-shrink-0 overflow-hidden">
-          <p className="font-serif text-stone-900 truncate">{currentTrack.title}</p>
-          <p className="text-xs text-stone-500 uppercase tracking-widest mt-0.5">Надежда Колесникова</p>
+        {/* Название и мобильный таймер */}
+        <div className="flex-1 min-w-0 pr-2">
+          <p className="font-serif text-sm md:text-base text-stone-900 truncate">{currentTrack.title}</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <p className="text-[10px] md:text-xs text-stone-500 uppercase tracking-widest truncate">Надежда Колесникова</p>
+            <span className="text-[10px] font-mono text-amber-700 font-medium md:hidden">
+              {formatTime(progress)}
+            </span>
+          </div>
         </div>
 
-        {/* Центральная часть: Шкала прогресса с таймерами */}
-        <div className="flex-1 flex items-center gap-4 text-xs font-mono text-stone-400">
-           <span>{formatTime(progress)}</span>
-           
-           <div className="relative flex-1 h-1.5 bg-stone-100 rounded-full cursor-pointer group">
-              <div className="absolute top-0 left-0 h-full bg-amber-700 rounded-full" style={{ width: `${progressPercent}%` }}>
-                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-amber-900 rounded-full opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-1/2"></div>
+        {/* === ШКАЛА ДЛЯ ПК === */}
+        <div className="hidden md:flex flex-1 items-center justify-center gap-4 text-xs font-mono text-stone-400 px-4">
+           <span className="w-10 text-right">{formatTime(progress)}</span>
+           <div className="relative w-full max-w-md h-1.5 bg-stone-100 rounded-full cursor-pointer group">
+              <div className="absolute top-0 left-0 h-full bg-amber-700 rounded-full pointer-events-none transition-all duration-100 ease-linear" style={{ width: `${progressPercent}%` }}>
+                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-amber-900 rounded-full opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-1/2 shadow-sm"></div>
               </div>
-              <input 
-                type="range" min={0} max={duration || 100} value={progress} 
-                onChange={handleSeek} 
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
+              <input type="range" min={0} max={duration || 100} value={progress} onChange={handleSeek} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
            </div>
-
-           <span>{formatTime(duration)}</span>
+           <span className="w-10 text-left">{formatTime(duration)}</span>
         </div>
 
         {/* Кнопки управления */}
-        <div className="flex items-center gap-5 flex-shrink-0">
-           
-           {/* Поделиться */}
-           <button onClick={handleShare} className="text-stone-400 hover:text-stone-900 transition-colors" title="Копировать ссылку">
+        <div className="flex items-center gap-4 md:gap-5 shrink-0">
+           <button onClick={handleShare} className="hidden md:block text-stone-400 hover:text-stone-900 transition-colors" title="Копировать ссылку">
              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
            </button>
            
-           {/* Скачать */}
-           <button onClick={handleDownload} disabled={isDownloading} className="text-stone-400 hover:text-stone-900 transition-colors disabled:opacity-50" title="Скачать трек">
+           <button onClick={handleDownload} disabled={isDownloading} className="hidden sm:block text-stone-400 hover:text-stone-900 transition-colors disabled:opacity-50" title="Скачать">
              {isDownloading ? (
-               <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+               <svg className="w-5 h-5 animate-spin text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
              ) : (
                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
              )}
            </button>
 
-           <div className="w-px h-5 bg-stone-200 mx-1"></div>
+           <div className="w-px h-6 bg-stone-200 hidden sm:block"></div>
 
-           {/* Закрыть */}
-           <button onClick={closePlayer} className="text-stone-400 hover:text-red-700 transition-colors p-1" title="Закрыть">
-             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+           <button onClick={closePlayer} className="text-stone-400 hover:text-red-600 transition-colors p-2 -mr-2" title="Закрыть">
+             <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
            </button>
         </div>
 

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Image from 'next/image';
 import PlayTrackButton from '@/components/music/PlayTrackButton';
 
-// Строгие типы данных вместо any
 interface StrapiTrack {
   id: number;
   title: string;
@@ -65,13 +64,13 @@ export default function ReleaseCard({ release, index }: ReleaseCardProps) {
         <div className="overflow-hidden">
           <div className="flex flex-col border-t border-stone-100 pt-6">
             {release.tracks?.map((track: StrapiTrack, idx: number) => (
-              <div key={track.id} className="py-4 border-b border-stone-50 flex items-center justify-between hover:bg-stone-50 transition duration-300 px-4 rounded-xl group/track">
-                <div className="flex items-center gap-6">
-                  <span className="text-stone-300 font-mono text-sm w-5">{String(idx + 1).padStart(2, '0')}</span>
-                  <span className="text-lg font-serif text-stone-800 truncate pr-4">{track.title}</span>
+              <div key={track.id} className="py-4 border-b border-stone-50 flex items-center justify-between hover:bg-stone-50 transition duration-300 px-2 sm:px-4 rounded-xl group/track">
+                <div className="flex items-center gap-4 sm:gap-6 overflow-hidden">
+                  <span className="text-stone-300 font-mono text-sm w-4 sm:w-5 shrink-0">{String(idx + 1).padStart(2, '0')}</span>
+                  <span className="text-base sm:text-lg font-serif text-stone-800 truncate pr-2">{track.title}</span>
                 </div>
-                {/* Кнопка показывается плавно при наведении */}
-                <div className="opacity-0 group-hover/track:opacity-100 transition duration-300 shrink-0">
+                {/* ИСПРАВЛЕНИЕ: Кнопка всегда видна на мобилках (opacity-100) и скрыта до наведения только на ПК (lg:opacity-0) */}
+                <div className="opacity-100 lg:opacity-0 lg:group-hover/track:opacity-100 transition duration-300 shrink-0">
                   <PlayTrackButton track={track} />
                 </div>
               </div>
