@@ -28,36 +28,35 @@ export default async function Home() {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 
   return (
-    <main className="p-8 max-w-6xl mx-auto space-y-32 my-12 animate-fade-in-up overflow-hidden">
+    <main className="p-8 max-w-6xl mx-auto space-y-32 my-12 animate-fade-in-up">
+      
       <section className="flex flex-col md:flex-row gap-16 items-center">
-        <div className="flex-1 space-y-8 z-10">
+        <div className="flex-1 space-y-8">
           <h1 className="text-6xl md:text-8xl font-serif text-stone-900 leading-tight">
             Надежда <br/><span className="text-amber-800 italic text-5xl md:text-7xl font-light">Колесникова</span>
           </h1>
-          <p className="text-xl text-stone-600 leading-relaxed border-l-2 border-amber-700 pl-6 font-light">
+          <p className="text-xl text-stone-600 leading-relaxed font-light">
             {artistInfo.shortBio || "Добро пожаловать на официальный сайт. Здесь вы найдете расписание концертов, дискографию и последние новости."}
           </p>
           
-          <div className="flex flex-wrap gap-5 pt-6">
-            <Link href="/music" className="bg-amber-700 text-white px-10 py-4 rounded-full font-medium tracking-widest uppercase text-sm hover:bg-amber-800 hover:shadow-[0_10px_30px_rgba(180,83,9,0.3)] hover:-translate-y-1 transition-all duration-300">
+          <div className="flex flex-wrap gap-4 pt-4">
+            <Link href="/music" className="bg-stone-900 text-stone-50 px-8 py-3.5 rounded-full font-medium tracking-widest uppercase text-xs hover:bg-amber-700 hover:-translate-y-0.5 transition-all duration-300">
               Слушать музыку
             </Link>
-            <Link href="/about" className="bg-white border border-stone-200 text-stone-600 px-10 py-4 rounded-full font-medium tracking-widest uppercase text-sm hover:border-amber-700 hover:text-amber-700 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300">
+            <Link href="/about" className="bg-transparent border border-stone-300 text-stone-700 px-8 py-3.5 rounded-full font-medium tracking-widest uppercase text-xs hover:border-stone-900 hover:text-stone-900 transition-colors duration-300">
               Подробнее
             </Link>
           </div>
         </div>
         
-        {/* ИЗМЕНЕНО: Эстетика "Арки" */}
         {photoUrl && (
-          <div className="w-full md:w-5/12 relative group mt-10 md:mt-0">
-            {/* Декоративная линия позади (смещена вправо и вниз) */}
-            <div className="absolute top-6 left-6 w-full h-full border border-amber-700/30 rounded-t-full rounded-b-[2rem] -z-10 transition-transform duration-700 group-hover:translate-x-3 group-hover:translate-y-3"></div>
-            
-            {/* Само фото в виде арки */}
-            <div className="relative rounded-t-full rounded-b-[2rem] overflow-hidden shadow-2xl border-4 border-white bg-white">
-              <Image src={photoUrl} alt="Надежда Колесникова" width={600} height={800} className="w-full object-cover hover:scale-105 transition-transform duration-1000 ease-out" priority />
-            </div>
+          <div className="w-full md:w-5/12">
+            <Image 
+              src={photoUrl} alt="Надежда Колесникова" 
+              width={600} height={800} 
+              className="w-full h-auto object-cover rounded-2xl shadow-md" 
+              priority 
+            />
           </div>
         )}
       </section>
@@ -73,12 +72,13 @@ export default async function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {upcomingEvents.map((event) => (
-              <div key={event.id} className="bg-white p-8 border border-stone-100 shadow-sm hover:shadow-md transition duration-300 rounded-2xl">
+              <div key={event.id} className="bg-stone-50 p-8 border border-stone-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
                 <div className="text-amber-700 font-bold mb-3 tracking-widest uppercase text-sm">{formatDate(event.date)}</div>
                 <h3 className="text-2xl font-serif text-stone-900 mb-2">{event.title}</h3>
                 <div className="text-stone-500 mb-6 font-light">г. {event.city}, {event.venue}</div>
+                {/* ИЗМЕНЕНО: Дорогая кнопка "Билеты" */}
                 {event.ticketLink && (
-                  <a href={event.ticketLink} target="_blank" rel="noreferrer" className="inline-block bg-stone-50 border border-stone-200 text-stone-700 px-8 py-3 rounded-full hover:bg-amber-700 hover:text-white hover:border-amber-700 transition-all duration-300 text-sm uppercase tracking-widest font-medium">
+                  <a href={event.ticketLink} target="_blank" rel="noreferrer" className="inline-block bg-stone-900 text-stone-50 px-8 py-3 rounded-full hover:bg-amber-700 hover:shadow-[0_5px_15px_rgba(180,83,9,0.3)] hover:-translate-y-0.5 transition-all duration-300 text-xs uppercase tracking-widest font-medium">
                     Билеты
                   </a>
                 )}
