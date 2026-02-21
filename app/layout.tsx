@@ -1,4 +1,5 @@
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import AudioPlayer from "@/components/layout/AudioPlayer";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -21,11 +22,10 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Надежда Колесникова | Официальный сайт",
     description: "Расписание концертов, дискография, новости и организация выступлений.",
-    url: "https://nadezhda-kolesnikova.ru", // Пока ставим заглушку для будущего домена
+    url: "https://nadezhda-kolesnikova.ru", 
     siteName: "Надежда Колесникова",
     locale: "ru_RU",
     type: "website",
-    // Сюда позже можно будет добавить ссылку на красивую картинку-превью
   },
 };
 
@@ -35,10 +35,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased pb-24`}>
+    <html lang="ru">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-stone-50 min-h-screen flex flex-col`}>
         <Header />
-        {children}
+        
+        <div className="flex-grow pb-24"> 
+          {children}
+        </div>
+        
+        <Footer />
         <AudioPlayer />
       </body>
     </html>
