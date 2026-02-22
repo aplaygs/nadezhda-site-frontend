@@ -53,9 +53,14 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Копирайт */}
-        <div className="border-t border-stone-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-light tracking-wide">
-          <p>&copy; {currentYear} Надежда Колесникова. Все права защищены.</p>
+        {/* Копирайт и Политика */}
+        <div className="border-t border-stone-800 pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs font-light tracking-wide">
+          <div className="flex flex-col md:flex-row gap-2 md:gap-6">
+            <p>&copy; {currentYear} Надежда Колесникова. Все права защищены.</p>
+            <Link href="/privacy" className="hover:text-amber-600 transition-colors underline underline-offset-4 decoration-stone-700">
+              Политика конфиденциальности
+            </Link>
+          </div>
           <p>
             Разработка сайта — <a href="#" className="hover:text-amber-600 transition-colors">Aplaygs</a>
           </p>
